@@ -8,10 +8,6 @@
 
 class WaitGroup {
   public:
-
-    enum WaitStat {
-
-    };
     // Constructs the WaitGroup with the specified initial count.
     inline WaitGroup(unsigned int initialCount = 0);
 
@@ -23,6 +19,18 @@ class WaitGroup {
     inline void Wait() const;
 
     inline bool WaitFor(unsigned int milliseconds) const;
+
+    class DoneGuard {
+      public:
+        DoneGuard(const WaitGroup &_wg);
+        ~DoneGuard();
+
+        DoneGuard(const DoneGuard &) = delete;
+        DoneGuard &operator=(const DoneGuard &) = delete;
+
+      private:
+        const WaitGroup &wg;
+    };
 
   private:
     struct Data {
@@ -65,5 +73,9 @@ bool WaitGroup::WaitFor(unsigned int milliseconds) const {
     std::unique_lock<std::mutex> lock(data->mutex);
     return data->cv.wait_for(lock, std::chrono::milliseconds(milliseconds), [this] { return data->count == 0; });
 }
+
+WaitGroup::DoneGuard::DoneGuard(const WaitGroup &_wg) : wg(_wg) {}
+
+inline WaitGroup::DoneGuard::~DoneGuard() { wg.Done(); }
 
 #endif
