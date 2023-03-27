@@ -22,8 +22,8 @@ class WaitGroup {
 
     class DoneGuard {
       public:
-        DoneGuard(const WaitGroup &_wg);
-        ~DoneGuard();
+        inline DoneGuard(const WaitGroup &_wg);
+        inline ~DoneGuard();
 
         DoneGuard(const DoneGuard &) = delete;
         DoneGuard &operator=(const DoneGuard &) = delete;
@@ -76,6 +76,6 @@ bool WaitGroup::WaitFor(unsigned int milliseconds) const {
 
 WaitGroup::DoneGuard::DoneGuard(const WaitGroup &_wg) : wg(_wg) {}
 
-inline WaitGroup::DoneGuard::~DoneGuard() { wg.Done(); }
+WaitGroup::DoneGuard::~DoneGuard() { wg.Done(); }
 
 #endif
